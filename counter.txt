@@ -1,0 +1,43 @@
+module counter (clock,reset,enable,counterout);
+	input clock,reset,enable;
+	output [3:0] counterout;
+	
+	wire clock, reset, enable;
+	reg [3:0] counterout;
+	
+	always @ (posedge clock) begin : COUNTER
+		if (reset == 1'b1) begin
+			counterout <= #1 4'b0000;
+		end
+		else if (enable == 1'b1) begin
+			counterout <= counterout + 1;
+		end
+	end
+endmodule
+
+module countertb();
+	reg clk, rst, en;
+	wire [3:0] cout;
+	
+	initial begin
+		$dumpfile("testCounter.vcd");
+		$dumpvars(0,countertb);
+		$display ("time\t clock reset enable counter");
+		$monitor ("%g\t %b %b %b %b", $time,clk,rst,en,cout);
+		
+		clk = 1;
+		rst =0;
+		en = 0;
+		#5 rst = 1;
+		#10 rst = 0;
+		#10 en = 1;
+		#100 en =0;
+		#5 $finish;
+	end
+	
+	always begin
+		#5 clk = ~clk;
+	end
+	
+	counter test(clk,rst,en,cout);
+endmodule
